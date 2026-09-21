@@ -44,6 +44,10 @@ public class Cuenta {
     }
 
     public void debito(BigDecimal monto) {
+        if (monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El monto no puede ser negativo ni cero.");
+        }
+
         BigDecimal nuevoSaldo = this.saldo.subtract(monto);
         if(nuevoSaldo.compareTo(BigDecimal.ZERO) < 0){
             throw new DineroInsuficienteException("Dinero insuficiente en la cuenta.");
@@ -52,6 +56,10 @@ public class Cuenta {
     }
 
     public void credito(BigDecimal monto) {
+        if (monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El monto no puede ser negativo ni cero.");
+        }
+
         this.saldo = saldo.add(monto);
     }
 
