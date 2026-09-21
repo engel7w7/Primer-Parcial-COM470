@@ -38,8 +38,8 @@ src/main/java/test/springboot/app/
 └── Datos.java        Datos de prueba (crearCuenta001/002, crearBanco)
 
 src/test/java/test/springboot/app/
-├── services/         CuentaServiceImplTest   (9 tests)
-└── controllers/      CuentaControllerTest    (4 tests, MockMvc)
+├── services/         CuentaServiceImplTest   (10 tests)
+└── controllers/      CuentaControllerTest    (2 tests)
 ```
 
 Colecciones de API: `Coleccion_COM470_Equipo.json` (Postman) y `Coleccion_COM470_Equipo_Insomnia.json` (Insomnia), con scripts de validación embebidos.
@@ -57,14 +57,14 @@ Colecciones de API: `Coleccion_COM470_Equipo.json` (Postman) y `Coleccion_COM470
 
 ---
 
-## Pruebas (13 en total)
+## Pruebas (12 en total)
 
 | Clase | Casos | Resultado |
 |---|---|---|
-| `CuentaServiceImplTest` | 9 (positivos y negativos, `assertAll`, Mockito) | Pasan |
-| `CuentaControllerTest` | 4 (MockMvc standalone) | Pasan |
+| `CuentaServiceImplTest` | 10 (positivos y negativos, `assertAll`, Mockito) | Pasan |
+| `CuentaControllerTest` | 2 (casos HTTP y valores `null`) | Pasan |
 
-Los casos negativos validan `DineroInsuficienteException`, ausencia de persistencia en fallo (`never().update`) y respuestas 404.
+Los casos negativos validan `DineroInsuficienteException`, ausencia de persistencia en fallo (`never().update`), excepciones por caída de base de datos (`RuntimeException` / timeouts) y respuestas HTTP 404 para valores nulos.
 
 ---
 
