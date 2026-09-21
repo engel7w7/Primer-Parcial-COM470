@@ -74,8 +74,6 @@ class CuentaServiceImplTest {
     @Test
     void testTransferirMontoNegativoLanzaExcepcion() {
         when(cuentaRepository.findById(1L)).thenReturn(origen);
-        when(cuentaRepository.findById(2L)).thenReturn(destino);
-        when(bancoRepository.findById(1L)).thenReturn(banco);
         assertThrows(IllegalArgumentException.class, () -> {
             service.transferir(1L, 2L, new BigDecimal("-100"), 1L);
         }, "El sistema debería bloquear transferencias con montos matemáticamente negativos");
