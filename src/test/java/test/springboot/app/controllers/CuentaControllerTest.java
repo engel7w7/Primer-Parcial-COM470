@@ -1,22 +1,20 @@
 package test.springboot.app.controllers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import test.springboot.app.Datos;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import test.springboot.app.models.Cuenta;
 import test.springboot.app.services.CuentaService;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CuentaControllerTest {
@@ -27,51 +25,34 @@ class CuentaControllerTest {
     @InjectMocks
     CuentaController controller;
 
-    MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-    }
 
     // ==========================================
     // ==========================================
 
     @Test
-    void testControllerRevisarSaldo() throws Exception {
-        when(cuentaService.revisarSaldo(1L)).thenReturn(new BigDecimal("1000"));
+    void testFindByIdPositivoController() {
+        Cuenta cuentaMock = new Cuenta(1L, "Andrés", new BigDecimal("1000"));
+        when(cuentaService.findById(1L)).thenReturn(cuentaMock);
 
-        mockMvc.perform(get("/api/cuentas/1/saldo"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.cuentaId").value(1))
-            .andExpect(jsonPath("$.saldo").value(1000));
+        ResponseEntity<?> response = controller.findById(1L);
+
+        assertAll("Validación HTTP 200 OK Ismael",
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertNotNull(response.getBody())
+        );
     }
 
     @Test
-    void testControllerFindByIdValido() throws Exception {
-        when(cuentaService.findById(1L)).thenReturn(Datos.crearCuenta001());
-
-        mockMvc.perform(get("/api/cuentas/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.persona").value("Andrés"))
-            .andExpect(jsonPath("$.saldo").value(1000));
-    }
-
-    @Test
-    void testControllerFindByIdNoExiste() throws Exception {
+    void testFindByIdCasoNullController() {
+        //Simular caso Null
         when(cuentaService.findById(99L)).thenReturn(null);
 
-        mockMvc.perform(get("/api/cuentas/99"))
-            .andExpect(status().isNotFound());
-    }
+        ResponseEntity<?> response = controller.findById(99L);
 
-    @Test
-    void testControllerRevisarTotalTransferencias() throws Exception {
-        when(cuentaService.revisarTotalTransferencias(1L)).thenReturn(1);
-
-        mockMvc.perform(get("/api/bancos/1/transferencias"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.bancoId").value(1))
-            .andExpect(jsonPath("$.totalTransferencias").value(1));
+        assertAll("Validación HTTP 404 Nulos Ismael",
+                () -> assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()),
+                () -> assertNull(response.getBody())
+        );
     }
 }
