@@ -88,9 +88,6 @@ class CuentaServiceImplTest {
         );
     }
 
-    // ==========================================
-    // ==========================================
-
     @Test
     void testRevisarSaldo() { // CP-06
         when(cuentaRepository.findById(1L)).thenReturn(origen);
@@ -137,5 +134,31 @@ class CuentaServiceImplTest {
     void testCreditoModelo() { // CP-10
         destino.credito(new BigDecimal("500"));
         assertEquals("2500", destino.getSaldo().toPlainString());
+    }
+
+    @Test
+    void testTransferirExcepcionBaseDeDatos() { // CP-06
+        when(cuentaRepository.findById(1L)).thenReturn(origen);
+
+        doThrow(new RuntimeException("Error BD"))
+                .when(cuentaRepository).update(any(Cuenta.class));
+
+        Exception ex = assertThrows(RuntimeException.class, () -> {
+            service.transferir(1L, 2L, new BigDecimal("100"), 1L);
+        });
+        assertEquals("Error BD", ex.getMessage());
+    }
+
+    @Test
+    void testTransferirExcepcionAlBuscarBanco() { // CP-07
+        when(cuentaRepository.findById(1L)).thenReturn(origen);
+        when(cuentaRepository.findById(2L)).thenReturn(destino);
+        when(bancoRepository.findById(1L))
+                .thenThrow(new RuntimeException("Servidor banco inaccesible"));
+
+        assertThrows(RuntimeException.class, () -> {
+            service.transferir(1L, 2L, new BigDecimal("100"), 1L);
+        });
+        verify(bancoRepository, never()).update(any(Banco.class));
     }
 }

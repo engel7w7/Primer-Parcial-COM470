@@ -17,6 +17,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import org.springframework.web.util.NestedServletException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class CuentaControllerTest {
@@ -34,8 +39,6 @@ class CuentaControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    // ==========================================
-    // ==========================================
 
     @Test
     void testControllerRevisarSaldo() throws Exception {
@@ -73,5 +76,33 @@ class CuentaControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.bancoId").value(1))
             .andExpect(jsonPath("$.totalTransferencias").value(1));
+    }
+    @Test
+    void testControllerTransferirPositivo() throws Exception {
+        doNothing().when(cuentaService).transferir(1L, 2L, new BigDecimal("100"), 1L);
+
+        mockMvc.perform(post("/api/cuentas/transferir")
+                        .param("origen", "1")
+                        .param("destino", "2")
+                        .param("monto", "100")
+                        .param("bancoId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensaje").value("Transferencia realizada con éxito"))
+                .andExpect(jsonPath("$.origen").value(1))
+                .andExpect(jsonPath("$.destino").value(2));
+    }
+
+    @Test
+    void testControllerTransferirExcepcion() throws Exception {
+        doThrow(new IllegalArgumentException("Monto inválido"))
+                .when(cuentaService).transferir(1L, 2L, new BigDecimal("-100"), 1L);
+
+        assertThrows(NestedServletException.class, () -> {
+            mockMvc.perform(post("/api/cuentas/transferir")
+                    .param("origen", "1")
+                    .param("destino", "2")
+                    .param("monto", "-100")
+                    .param("bancoId", "1"));
+        });
     }
 }
