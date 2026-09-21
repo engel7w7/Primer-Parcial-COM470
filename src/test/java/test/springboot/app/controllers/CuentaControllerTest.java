@@ -27,8 +27,6 @@ class CuentaControllerTest {
 
 
 
-    // ==========================================
-    // ==========================================
 
     @Test
     void testFindByIdPositivoController() {
@@ -54,5 +52,33 @@ class CuentaControllerTest {
                 () -> assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode()),
                 () -> assertNull(response.getBody())
         );
+    }
+    @Test
+    void testControllerTransferirPositivo() throws Exception {
+        doNothing().when(cuentaService).transferir(1L, 2L, new BigDecimal("100"), 1L);
+
+        mockMvc.perform(post("/api/cuentas/transferir")
+                        .param("origen", "1")
+                        .param("destino", "2")
+                        .param("monto", "100")
+                        .param("bancoId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensaje").value("Transferencia realizada con éxito"))
+                .andExpect(jsonPath("$.origen").value(1))
+                .andExpect(jsonPath("$.destino").value(2));
+    }
+
+    @Test
+    void testControllerTransferirExcepcion() throws Exception {
+        doThrow(new IllegalArgumentException("Monto inválido"))
+                .when(cuentaService).transferir(1L, 2L, new BigDecimal("-100"), 1L);
+
+        assertThrows(NestedServletException.class, () -> {
+            mockMvc.perform(post("/api/cuentas/transferir")
+                    .param("origen", "1")
+                    .param("destino", "2")
+                    .param("monto", "-100")
+                    .param("bancoId", "1"));
+        });
     }
 }
