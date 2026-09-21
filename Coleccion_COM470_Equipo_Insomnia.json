@@ -1,0 +1,122 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_source": "insomnia.desktop.app:v2024.1.0",
+  "resources": [
+    {
+      "_id": "wrk_com470",
+      "_type": "workspace",
+      "name": "COM470 - API Testing Unitario",
+      "parentId": null,
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "reqgrp_ismael",
+      "_type": "request_group",
+      "name": "Parte 2: Consultas y Auditoría (Ismael)",
+      "parentId": "wrk_com470",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -2000000000,
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "reqgrp_jhojan",
+      "_type": "request_group",
+      "name": "Parte 1: Lógica Transaccional (Jhojan)",
+      "parentId": "wrk_com470",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1000000000,
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "req_transferir_ok",
+      "_type": "request",
+      "parentId": "reqgrp_jhojan",
+      "name": "1. Transferencia Exitosa",
+      "method": "POST",
+      "url": "http://localhost:8080/api/cuentas/transferir",
+      "parameters": [
+        { "id": "p_origen_1", "name": "origen", "value": "1", "disabled": false },
+        { "id": "p_destino_2", "name": "destino", "value": "2", "disabled": false },
+        { "id": "p_monto_100", "name": "monto", "value": "100", "disabled": false },
+        { "id": "p_banco_1", "name": "bancoId", "value": "1", "disabled": false }
+      ],
+      "body": { "mimeType": "" },
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": "-1000000100",
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "req_transferir_fail",
+      "_type": "request",
+      "parentId": "reqgrp_jhojan",
+      "name": "2. Transferencia Fallida (Sin Fondos)",
+      "method": "POST",
+      "url": "http://localhost:8080/api/cuentas/transferir",
+      "parameters": [
+        { "id": "p_origen_1", "name": "origen", "value": "1", "disabled": false },
+        { "id": "p_destino_2", "name": "destino", "value": "2", "disabled": false },
+        { "id": "p_monto_1200", "name": "monto", "value": "1200", "disabled": false },
+        { "id": "p_banco_1", "name": "bancoId", "value": "1", "disabled": false }
+      ],
+      "body": { "mimeType": "" },
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": "-1000000200",
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "req_saldo",
+      "_type": "request",
+      "parentId": "reqgrp_ismael",
+      "name": "3. Consultar Saldo",
+      "method": "GET",
+      "url": "http://localhost:8080/api/cuentas/1/saldo",
+      "parameters": [],
+      "body": { "mimeType": "" },
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": "-1000000300",
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "req_findbyid",
+      "_type": "request",
+      "parentId": "reqgrp_ismael",
+      "name": "4. Buscar Cuenta por ID",
+      "method": "GET",
+      "url": "http://localhost:8080/api/cuentas/1",
+      "parameters": [],
+      "body": { "mimeType": "" },
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": "-1000000400",
+      "modified": 0,
+      "created": 0
+    },
+    {
+      "_id": "req_auditoria",
+      "_type": "request",
+      "parentId": "reqgrp_ismael",
+      "name": "5. Auditoría: Total Transferencias Banco",
+      "method": "GET",
+      "url": "http://localhost:8080/api/bancos/1/transferencias",
+      "parameters": [],
+      "body": { "mimeType": "" },
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": "-1000000500",
+      "modified": 0,
+      "created": 0
+    }
+  ]
+}

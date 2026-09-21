@@ -87,4 +87,55 @@ class CuentaServiceImplTest {
                 () -> assertEquals("500", origen.getSaldo().toPlainString(), "El saldo debería ser 500 tras el débito")
         );
     }
+
+    // ==========================================
+    // ==========================================
+
+    @Test
+    void testRevisarSaldo() { // CP-06
+        when(cuentaRepository.findById(1L)).thenReturn(origen);
+        BigDecimal saldo = service.revisarSaldo(1L);
+        assertEquals("1000", saldo.toPlainString());
+        verify(cuentaRepository).findById(1L);
+    }
+
+    @Test
+    void testRevisarTotalTransferencias() { // CP-07
+        when(bancoRepository.findById(1L)).thenReturn(banco);
+        int trx = service.revisarTotalTransferencias(1L);
+        assertEquals(0, trx);
+        verify(bancoRepository).findById(1L);
+    }
+
+    @Test
+    void testIncrementoHistorialBancario() { // CP-08
+        when(cuentaRepository.findById(1L)).thenReturn(origen);
+        when(cuentaRepository.findById(2L)).thenReturn(destino);
+        when(bancoRepository.findById(1L)).thenReturn(banco);
+
+        service.transferir(1L, 2L, new BigDecimal("100"), 1L);
+
+        assertAll("Incremento de historial bancario Ismael",
+                () -> assertEquals(1, banco.getTotalTransferencias()),
+                () -> verify(bancoRepository).update(banco)
+        );
+    }
+
+    @Test
+    void testFindByIdValidoEInvalido() { // CP-09 (+ caso inválido extra)
+        when(cuentaRepository.findById(1L)).thenReturn(origen);
+        when(cuentaRepository.findById(99L)).thenReturn(null);
+
+        assertAll("Búsqueda de cuentas Ismael",
+                () -> assertNotNull(service.findById(1L)),
+                () -> assertEquals("Andrés", service.findById(1L).getPersona()),
+                () -> assertNull(service.findById(99L))
+        );
+    }
+
+    @Test
+    void testCreditoModelo() { // CP-10
+        destino.credito(new BigDecimal("500"));
+        assertEquals("2500", destino.getSaldo().toPlainString());
+    }
 }
