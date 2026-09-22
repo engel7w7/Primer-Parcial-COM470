@@ -1,16 +1,16 @@
 {
   "info": {
     "_postman_id": "c1a2b3c4-d5e6-7890-1234-56789abcdef0",
-    "name": "COM470 - API Testing Unitario",
-    "description": "Colección colaborativa para validación E2E. Dividida por responsabilidades (Jhojan e Ismael).",
+    "name": "COM470 - API Testing Unitario (Primer Parcial - Grupo 1)",
+    "description": "Colección colaborativa para validación E2E en COM470 (Prueba y Mantenimiento de Software - USFX). Trazabilidad de Historias de Usuario (HU) y Casos de Prueba (CP) entre Jhojan Romero e Ismael Garcia.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Parte 1: Lógica Transaccional (Jhojan)",
+      "name": "Parte 1: Lógica Transaccional (Jhojan Romero)",
       "item": [
         {
-          "name": "1. Transferencia Exitosa",
+          "name": "HU-08 / CP-08: Transferencia Exitosa (200 OK)",
           "event": [
             {
               "listen": "test",
@@ -22,6 +22,8 @@
                   "pm.test(\"El JSON confirma la transferencia\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.mensaje).to.eql(\"Transferencia realizada con éxito\");",
+                  "    pm.expect(jsonData.origen).to.eql(1);",
+                  "    pm.expect(jsonData.destino).to.eql(2);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -47,7 +49,7 @@
           }
         },
         {
-          "name": "2. Transferencia Fallida (Sin Fondos)",
+          "name": "HU-09 / CP-02: Transferencia Fallida - Fondos Insuficientes (Status 500)",
           "event": [
             {
               "listen": "test",
@@ -81,14 +83,50 @@
               ]
             }
           }
+        },
+        {
+          "name": "HU-03 / CP-03: Transferencia Fallida - Monto Negativo Bug BC001 (Status 500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Falla esperada por IllegalArgumentException (Status 500)\", function () {",
+                  "    pm.response.to.have.status(500);",
+                  "});",
+                  "pm.test(\"El mensaje de error rechaza montos negativos o cero\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"El monto no puede ser negativo ni cero\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/cuentas/transferir?origen=1&destino=2&monto=-100&bancoId=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cuentas", "transferir"],
+              "query": [
+                {"key": "origen", "value": "1"},
+                {"key": "destino", "value": "2"},
+                {"key": "monto", "value": "-100"},
+                {"key": "bancoId", "value": "1"}
+              ]
+            }
+          }
         }
       ]
     },
     {
-      "name": "Parte 2: Consultas y Auditoría (Ismael)",
+      "name": "Parte 2: Consultas y Auditoría (Ismael Garcia)",
       "item": [
         {
-          "name": "3. Consultar Saldo",
+          "name": "HU-10 / CP-10: Consultar Saldo (200 OK)",
           "event": [
             {
               "listen": "test",
@@ -100,6 +138,7 @@
                   "pm.test(\"El JSON retorna el saldo numérico de la cuenta\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('saldo');",
+                  "    pm.expect(jsonData.cuentaId).to.eql(1);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -119,7 +158,7 @@
           }
         },
         {
-          "name": "4. Buscar Cuenta por ID",
+          "name": "HU-13 & HU-17 / CP-13 & CP-17: Buscar Cuenta por ID - Existente (200 OK)",
           "event": [
             {
               "listen": "test",
@@ -131,6 +170,7 @@
                   "pm.test(\"Se retorna la entidad Cuenta con nombre y saldo\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.persona).to.eql(\"Andrés\");",
+                  "    pm.expect(jsonData.id).to.eql(1);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -150,7 +190,34 @@
           }
         },
         {
-          "name": "5. Auditoría: Total Transferencias Banco",
+          "name": "HU-18 / CP-18: Buscar Cuenta por ID - Inexistente / Nulo (404 Not Found)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code es 404 Not Found\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/cuentas/99",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "cuentas", "99"]
+            }
+          }
+        },
+        {
+          "name": "HU-11 & HU-12 / CP-11: Auditoría: Total Transferencias Banco (200 OK)",
           "event": [
             {
               "listen": "test",
@@ -162,6 +229,7 @@
                   "pm.test(\"El banco retorna el historial de transferencias\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('totalTransferencias');",
+                  "    pm.expect(jsonData.bancoId).to.eql(1);",
                   "});"
                 ],
                 "type": "text/javascript"
