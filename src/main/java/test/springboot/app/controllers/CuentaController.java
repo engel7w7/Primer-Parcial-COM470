@@ -19,9 +19,6 @@ public class CuentaController {
         this.cuentaService = cuentaService;
     }
 
-    // ==========================================
-    // ==========================================
-
     @PostMapping("/cuentas/transferir")
     public ResponseEntity<?> transferir(@RequestParam Long origen,
                                         @RequestParam Long destino,
@@ -35,9 +32,6 @@ public class CuentaController {
         response.put("monto", monto);
         return ResponseEntity.ok(response);
     }
-
-    // ==========================================
-    // ==========================================
 
     @GetMapping("/cuentas/{id}/saldo")
     public ResponseEntity<?> revisarSaldo(@PathVariable Long id) {
