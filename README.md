@@ -183,8 +183,13 @@ Sin embargo, la IA actúa como una herramienta de soporte y no como reemplazo de
 # Ejecutar suite de pruebas unitarias en Windows
 mvnw.cmd test
 
+
 # O usando Maven instalado localmente
 mvn test
+
+# Desde powershell
+.\mvnw.cmd test
+
 ```
 
 ### Colecciones de API para Postman / Insomnia
